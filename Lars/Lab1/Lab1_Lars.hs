@@ -84,3 +84,43 @@ findSum list = if prime (sum list) then (sum list) else findSum ((tail list) ++ 
 
 startFinding :: Int
 startFinding = findSum (primes)
+
+-- Exercise 8
+data Boy = Matthew | Peter | Jack | Arnold | Carl 
+	deriving (Eq,Show)
+
+boys = [Matthew, Peter, Jack, Arnold, Carl]
+
+accuses :: Boy -> Boy -> Bool
+accuses Matthew x = not (x == Matthew) && not (x == Carl) 
+accuses Peter x = x == Matthew || x == Jack
+accuses Jack x = not (accuses Matthew x) && not (accuses Peter x)
+accuses Arnold  x = accuses Matthew x /= accuses Peter x
+accuses Carl x = not (accuses Arnold x)
+
+checkAccusement :: Boy -> [Boy] -> [Boy] -> [Boy]
+checkAccusement x xs ys = if null xs
+                            then ys
+                            else if accuses (head xs) x
+                            then checkAccusement x (tail xs) ([head xs] ++ ys)
+                            else checkAccusement x (tail xs) ys
+
+accusers :: Boy -> [Boy]
+accusers x = checkAccusement x boys []
+
+-- Because there is only one possibility where 3 people are correct according to the 
+-- teacher the boy with 3 accusers will be found guilty.
+checkGuilty :: Boy -> [Boy] -> [Boy]
+checkGuilty x xs = if length (accusers x) == 3
+					then [x]
+					else checkGuilty (head xs) (tail xs)
+
+guilty :: [Boy]
+guilty = checkGuilty (head boys) (tail boys)
+
+
+
+
+
+
+
