@@ -109,14 +109,11 @@ accusers :: Boy -> [Boy]
 accusers x = checkAccusement x boys []
 
 -- Because there is only one possibility where 3 people are correct according to the 
--- teacher the boy with 3 accusers will be found guilty.
+-- teacher the boy with 3 accusers will be found
 checkGuilty :: Boy -> [Boy] -> [Boy]
 checkGuilty x xs = if length (accusers x) == 3
 					then [x]
 					else checkGuilty (head xs) (tail xs)
-
-guilty :: [Boy]
-guilty = checkGuilty (head boys) (tail boys)
 
 
 
