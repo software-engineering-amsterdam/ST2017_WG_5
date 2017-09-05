@@ -72,6 +72,9 @@ myTestExercise2 n = 2 ^ n == length (subsequences [1..n])
 
 
 -- exercise 3 -------------------------------------------------------:
+-- it is difficult to test because of the large number that the factorial produces.
+-- This makes is only testable for small(er) numbers
+-- You are only testing a part of the specification. 
 perms :: [a] ->[[a]]
 perms [] = [[]]
 perms (x:xs) = concat (map (insrt x) (perms xs)) where
