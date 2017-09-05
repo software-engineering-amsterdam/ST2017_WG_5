@@ -99,6 +99,7 @@ test4 n = length(perms([1..n])) == product([1..n])
 
 
 -- exercise 6 -------------------------------------------------------:
+-- smallest primes [30031,510511,9699691,223092871,6469693231]
 prime :: Integer -> Bool
 prime n = n > 1 && all (\ x -> rem n x /= 0) xs
       where xs = takeWhile (\ y -> y^2 <= n) primes
