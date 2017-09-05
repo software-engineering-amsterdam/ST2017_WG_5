@@ -31,7 +31,7 @@ gen1 = choose (0,10000)
 gen2 :: Gen Int
 gen2 = choose (1,20)
 
--- exercise 1 -------------------------------------------------------:
+-- exercise 1a -------------------------------------------------------:
 right :: Int -> Int
 right n = (abs (n * (n + 1) * (2 * n + 1)) ) `div` 6
 
@@ -41,11 +41,13 @@ left n = sum (map square [1..n])
 square :: Int -> Int
 square n = n ^ 2
 
-myTestExercise1 :: Int -> Bool
-myTestExercise1 n = left n == right n
+myTestExercise1a :: Int -> Bool
+myTestExercise1a n = left n == right n
 
-main = quickCheck $ forAll gen1 myTestExercise1
---main = verboseCheck $ forAll gen1 myTestExercise1
+--main = quickCheck $ forAll gen1 myTestExercise1a
+
+-- exercise 1b -------------------------------------------------------:
+
 
 
 -- exercise 2 -------------------------------------------------------:
@@ -53,4 +55,3 @@ myTestExercise2 :: Int -> Bool
 myTestExercise2 n = 2 ^ n == length (subsequences [1..n])
 
 --main = verboseCheck $ forAll gen2 myTestExercise2
-
