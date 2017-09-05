@@ -86,8 +86,7 @@ startFinding :: Int
 startFinding = findSum (primes)
 
 -- Exercise 8
-data Boy = Matthew | Peter | Jack | Arnold | Carl 
-	deriving (Eq,Show)
+data Boy = Matthew | Peter | Jack | Arnold | Carl deriving (Eq, Show)
 
 boys = [Matthew, Peter, Jack, Arnold, Carl]
 
@@ -109,13 +108,16 @@ accusers :: Boy -> [Boy]
 accusers x = checkAccusement x boys []
 
 -- Because there is only one possibility where 3 people are correct according to the 
--- teacher the boy with 3 accusers will be found
+-- teacher the boy with 3 accusers will be found guilty. So we check for each person how 
+-- many accusers he has untill we find the one with 3 accusers.
 checkGuilty :: Boy -> [Boy] -> [Boy]
-checkGuilty x xs = if length (accusers x) == 3
-					then [x]
-					else checkGuilty (head xs) (tail xs)
+checkGuilty x xs = if length (accusers x) == 3 then [x] else checkGuilty (head xs) (tail xs)
 
+guilty :: [Boy]
+guilty = checkGuilty (head boys) (tail boys)
 
+honest :: [Boy]
+honest = accusers (head guilty)
 
 
 
