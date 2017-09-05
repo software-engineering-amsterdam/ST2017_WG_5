@@ -61,4 +61,25 @@ prime n = n > 1 && all (\ x -> rem n x /= 0) xs
 primes :: [Integer]
 primes = 2 : filter prime [3..] 
 
-main = print(primes)
+notprimes = filter (not . prime) (map ((+1) . product) [take n primes | n <- [1..10]])
+--main = print(notprimes)
+
+----8----
+--https://stackoverflow.com/questions/3963269/split-a-number-into-its-digits-with-haskell
+digits :: Integer -> [Int]
+digits = map (read . return) . show
+
+
+
+hi :: [Int] -> Int
+
+hi[x] = x
+hi(x:xs) = x + hi xs
+
+main = print(hi[1,2,3,4])
+
+
+
+
+
+
