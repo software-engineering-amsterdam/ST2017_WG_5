@@ -116,6 +116,7 @@ checkGuilty x xs = if length (accusers x) == 3 then [x] else checkGuilty (head x
 guilty :: [Boy]
 guilty = checkGuilty (head boys) (tail boys)
 
+-- Because only one person is guilty, 3 people who are accusing are correctly  
 honest :: [Boy]
 honest = accusers (head guilty)
 
