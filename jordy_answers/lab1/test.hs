@@ -119,8 +119,29 @@ isVisa digits = (head (intToList digits) == 4) && (luhn digits) && (length (intT
 tenPseudorandomNumbers :: Int -> Int -> [Int]
 tenPseudorandomNumbers seed num_test = take num_test . randomRs (100000000000000, 999999999999999) . mkStdGen $ seed
 
+
+prepareComputations2 :: Int -> Int
+prepareComputations2 digits = (sum (map sumAndSub (double_2nd (tail (revList digits)))))
+
 createLuhns :: Int -> Int -> [Int]
-createLuhns seed num = map getCheckDigit (map prepareComputations (tenPseudorandomNumbers seed num))
+createLuhns seed num = 
+	let
+		x = (tenPseudorandomNumbers seed num);
+	in zipWith pasteInt (map reverseInt (map getCheckDigit (map prepareComputations2 x))) x
+
+--createLuhns :: Int -> Int -> [Int]
+--createLuhns seed num = 
+--	let
+--		x = (tenPseudorandomNumbers seed num);
+--	in zipWith pasteInt (map getCheckDigit (map prepareComputations x)) x
+
+pasteInt :: Int -> Int -> Int
+pasteInt giant n = giant * 10 + n
+
+--reverse an integer: https://stackoverflow.com/questions/19725292/how-to-reverse-an-integer-in-haskell
+reverseInt :: Int -> Int
+reverseInt x = read . reverse . show $ x
+
 
 getCheckDigit :: Int -> Int
 getCheckDigit n =
@@ -128,4 +149,18 @@ getCheckDigit n =
 		then 0
 		else 10 - (n `mod` 10)
 
-main = print(createLuhns 1078593479 2000)
+checkLuhns :: Int -> Int -> [Bool]
+checkLuhns seed num = map luhn (createLuhns seed num)
+
+tmp :: Int -> Int -> [Int]
+tmp seed num = 
+	let
+		x = (tenPseudorandomNumbers seed num);
+	in map prepareComputations x
+
+main = print(checkLuhns 1078593479 10)
+--7992739871
+--main = print (double_2nd [7, 9,	9, 2,7,	3,	9,	8,	7,	1])
+--main = print (tmp 3 2)
+--main = print (getCheckDigit 441977446690719)
+--main = print (prepareComputations 441977446690719)
