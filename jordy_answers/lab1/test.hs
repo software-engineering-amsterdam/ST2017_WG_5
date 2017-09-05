@@ -17,7 +17,15 @@
 --	If we would like to prove the hypothesis, which should hold for all positive natural numbers, we should actually test for all these numbers.
 --	Since that is unachievable (calculations to infinity are not possible), the hypothesis can not be confirmed with these tests. The tests can only
 --	confirm that the hypothesis is true for the given test cases. If we however assume the hypothis is true, we can test wether or not subsequence
---	satisfies a part of its specification, namely creating a powerset of the correct length.  
+--	satisfies a part of its specification, namely creating a powerset of the correct length.
+--	
+--  Exercise 7c: Multiple tests can be implemented to test the validity of the luhn checker. If a large set of known valid and invalid luhn numbers is given,
+--	all that needs to be done is to perform the check on these numbers and see wether or not the outcome of the check matches the corresponding value of the
+--	luhn number (True or False). Since such a list is not present, we chose to implement a luhn number generator and a non-luhn number generator. 
+--	The checker should always return True with the numbers from the luhn generator, and False for the numbers of the non-luhn generator
+--	Tests can be run with (first parameter is the random seed, the second parameter the number of tests): 
+--	main = print(checkLuhnsFalse 1078593479 1000)
+--	main = print(checkLuhns 1078593478 1000)
 
 import Data.List
 import Test.QuickCheck
@@ -81,7 +89,7 @@ prepareComputations :: Int -> Int
 prepareComputations digits = (sum (map sumAndSub (double_2nd (tail (revList digits))))) + head (revList digits)
 
 revList :: Int -> [Int]
-revList digits = reverse (intToList digits)
+revList digits = reverse (intToList (digits * 10))
 
 sumAndSub :: Int -> Int
 sumAndSub n =
@@ -119,48 +127,48 @@ isVisa digits = (head (intToList digits) == 4) && (luhn digits) && (length (intT
 tenPseudorandomNumbers :: Int -> Int -> [Int]
 tenPseudorandomNumbers seed num_test = take num_test . randomRs (100000000000000, 999999999999999) . mkStdGen $ seed
 
-
+--add all numbers together and every second number is doubled
 prepareComputations2 :: Int -> Int
-prepareComputations2 digits = (sum (map sumAndSub (double_2nd (tail (revList digits)))))
+prepareComputations2 digits = (sum (map sumAndSub (double_2nd (revList digits))))
 
+-- generate luhn numbers by first creating a 15 digit random number, then doubling every other element starting
+-- at the last element. Then sum all the elements, and compute what the check digit should be to create a luhn number
 createLuhns :: Int -> Int -> [Int]
 createLuhns seed num = 
 	let
 		x = (tenPseudorandomNumbers seed num);
-	in zipWith pasteInt (map reverseInt (map getCheckDigit (map prepareComputations2 x))) x
+	in zipWith pasteInt x (map getCheckDigit (map prepareComputations2 x))
 
---createLuhns :: Int -> Int -> [Int]
---createLuhns seed num = 
---	let
---		x = (tenPseudorandomNumbers seed num);
---	in zipWith pasteInt (map getCheckDigit (map prepareComputations x)) x
+-- generate non-luhn numbers by first creating a 15 digit random number, then doubling every other element starting
+-- at the last element. Then sum all the elements, and compute what the check digit should be, add 1 to it, to create a non-luhn number
+createFalseLuhns :: Int -> Int -> [Int]
+createFalseLuhns seed num = 
+	let
+		x = (tenPseudorandomNumbers seed num);
+	in zipWith pasteInt2 x (map getCheckDigit (map prepareComputations2 x))
 
+--add the check digit to the other digits
 pasteInt :: Int -> Int -> Int
 pasteInt giant n = giant * 10 + n
 
---reverse an integer: https://stackoverflow.com/questions/19725292/how-to-reverse-an-integer-in-haskell
-reverseInt :: Int -> Int
-reverseInt x = read . reverse . show $ x
+--add the bad check digit to the other digits
+pasteInt2 :: Int -> Int -> Int
+pasteInt2 giant n = giant * 10 + n + 1
 
-
+-- compute check digit
 getCheckDigit :: Int -> Int
 getCheckDigit n =
 	if (n `mod` 10) == 0
 		then 0
 		else 10 - (n `mod` 10)
 
+-- check wether the luhn formula holds by inserting generated luhn numbers, entire array should hold True elements
 checkLuhns :: Int -> Int -> [Bool]
 checkLuhns seed num = map luhn (createLuhns seed num)
 
-tmp :: Int -> Int -> [Int]
-tmp seed num = 
-	let
-		x = (tenPseudorandomNumbers seed num);
-	in map prepareComputations x
+-- check wether the luhn formula holds by inserting generated non-luhn numbers, entire array should hold False elements
+checkLuhnsFalse :: Int -> Int -> [Bool]
+checkLuhnsFalse seed num = map luhn (createFalseLuhns seed num)
 
-main = print(checkLuhns 1078593479 10)
---7992739871
---main = print (double_2nd [7, 9,	9, 2,7,	3,	9,	8,	7,	1])
---main = print (tmp 3 2)
---main = print (getCheckDigit 441977446690719)
---main = print (prepareComputations 441977446690719)
+--main = print(checkLuhnsFalse 1078593479 1000)
+--main = print(checkLuhns 1078593478 1000)
