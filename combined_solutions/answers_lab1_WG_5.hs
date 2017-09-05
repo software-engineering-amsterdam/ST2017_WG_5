@@ -61,6 +61,19 @@ myTestExercise1a n = left n == right n
 
 -- exercise 1b -------------------------------------------------------:
 
+rightHand3 :: Int -> Int
+rightHand3 n = (n * (n + 1) `div` 2)^2
+
+tmp3 :: Int -> [Int]
+tmp3 n = map (^3) [1..n]
+
+leftHand3:: Int -> Int
+leftHand3 n = sum (tmp3 n)
+
+test3 :: Int ->  Bool
+test3 n = leftHand3 n == rightHand3 n
+
+--main = quickCheck $ forAll gen1 test3
 
 
 -- exercise 2 -------------------------------------------------------:
@@ -69,19 +82,31 @@ myTestExercise2 n = 2 ^ n == length (subsequences [1..n])
 
 --main = quickCheck $ forAll gen2 myTestExercise2
 
+-- exercise 3 -------------------------------------------------------:
+-- it is difficult to test because of the large number that the factorial produces.
+-- This makes is only testable for small(er) numbers
+-- You are only testing a part of the specification. 
+perms :: [a] ->[[a]]
+perms [] = [[]]
+perms (x:xs) = concat (map (insrt x) (perms xs)) where
+     insrt x [] = [[x]]
+     insrt x (y:ys) = (x:y:ys) : map (y:) (insrt x ys)
+
+test4 :: Int -> Bool
+test4 n = length(perms([1..n])) == product([1..n])
+--main = quickCheck $forAll gen1 test4
 
 
 
+-- exercise 6 -------------------------------------------------------:
+prime :: Integer -> Bool
+prime n = n > 1 && all (\ x -> rem n x /= 0) xs
+      where xs = takeWhile (\ y -> y^2 <= n) primes
+primes :: [Integer]
+primes = 2 : filter prime [3..] 
 
-
-
-
-
-
-
-
-
-
+notprimes = filter (not . prime) (map ((+1) . product) [take n primes | n <- [1..10]])
+--main = print(notprimes)
 
 -- exercise 7 a ----------------------- The Luhn Formula --------------:
 
