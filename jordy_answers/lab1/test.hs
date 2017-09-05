@@ -116,6 +116,16 @@ isVisa digits = (head (intToList digits) == 4) && (luhn digits) && (length (intT
 --main = print (isVisa 378787355568920)
 
 -- exercise 7 c -----------------------------------------------------:
+tenPseudorandomNumbers :: Int -> Int -> [Int]
+tenPseudorandomNumbers seed num_test = take num_test . randomRs (100000000000000, 999999999999999) . mkStdGen $ seed
 
+createLuhns :: Int -> Int -> [Int]
+createLuhns seed num = map getCheckDigit (map prepareComputations (tenPseudorandomNumbers seed num))
 
-main = tmp
+getCheckDigit :: Int -> Int
+getCheckDigit n =
+	if (n `mod` 10) == 0
+		then 0
+		else 10 - (n `mod` 10)
+
+main = print(createLuhns 1078593479 2000)
