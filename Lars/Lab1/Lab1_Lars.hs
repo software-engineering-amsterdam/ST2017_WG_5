@@ -76,9 +76,12 @@ prime n = n > 1 && all (\ x -> rem n x /= 0) xs
 primes :: [Int]
 primes = 2 : filter prime [3..550]
 
+-- Find the next prime
 nextPrime :: Int -> Int
 nextPrime x = if (prime (x + 1)) then (x + 1) else nextPrime (x + 1)
 
+-- Check if the sum of the 101 primes is also a prime. If yes we are done,
+-- if no we try again with the lowest prime discarted and a new highest prime found
 findSum ::[Int] -> Int
 findSum list = if prime (sum list) then (sum list) else findSum ((tail list) ++ [(nextPrime (last list))])
 
