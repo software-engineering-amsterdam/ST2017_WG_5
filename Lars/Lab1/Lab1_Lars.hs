@@ -76,9 +76,12 @@ prime n = n > 1 && all (\ x -> rem n x /= 0) xs
 primes :: [Int]
 primes = 2 : filter prime [3..550]
 
+-- Find the next prime
 nextPrime :: Int -> Int
 nextPrime x = if (prime (x + 1)) then (x + 1) else nextPrime (x + 1)
 
+-- Check if the sum of the 101 primes is also a prime. If yes we are done,
+-- if no we try again with the lowest prime discarted and a new highest prime found
 findSum ::[Int] -> Int
 findSum list = if prime (sum list) then (sum list) else findSum ((tail list) ++ [(nextPrime (last list))])
 
@@ -86,8 +89,7 @@ startFinding :: Int
 startFinding = findSum (primes)
 
 -- Exercise 8
-data Boy = Matthew | Peter | Jack | Arnold | Carl 
-	deriving (Eq,Show)
+data Boy = Matthew | Peter | Jack | Arnold | Carl deriving (Eq, Show)
 
 boys = [Matthew, Peter, Jack, Arnold, Carl]
 
@@ -109,13 +111,17 @@ accusers :: Boy -> [Boy]
 accusers x = checkAccusement x boys []
 
 -- Because there is only one possibility where 3 people are correct according to the 
--- teacher the boy with 3 accusers will be found
+-- teacher the boy with 3 accusers will be found guilty. So we check for each person how 
+-- many accusers he has untill we find the one with 3 accusers.
 checkGuilty :: Boy -> [Boy] -> [Boy]
-checkGuilty x xs = if length (accusers x) == 3
-					then [x]
-					else checkGuilty (head xs) (tail xs)
+checkGuilty x xs = if length (accusers x) == 3 then [x] else checkGuilty (head xs) (tail xs)
 
+guilty :: [Boy]
+guilty = checkGuilty (head boys) (tail boys)
 
+-- Because only one person is guilty, 3 people who are accusing are correctly  
+honest :: [Boy]
+honest = accusers (head guilty)
 
 
 

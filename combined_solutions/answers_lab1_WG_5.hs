@@ -1,7 +1,7 @@
 -- 	Jordy Bottelier 10747338
 --	Dennis Kruidenberg
 --	Timo Dobber
---	Lars Lokhoff
+--	Lars Lokhoff 10606165
 
 --	Answers excercises:
 
@@ -96,9 +96,58 @@ test4 :: Int -> Bool
 test4 n = length(perms([1..n])) == product([1..n])
 --main = quickCheck $forAll gen1 test4
 
+-- exercise 4 time: 3 hours -----------------------------------------:
+-- To test this with quicktest, you just check if the random number, which can 
+-- not be negative, is a prime and when that is the case you check if the 
+-- reversal is also a prime.
 
+-- From the lab.
+reversal :: Integer -> Integer
+reversal = read . reverse . show
+
+-- From the lab.
+prime :: Integer -> Bool
+prime n = n > 1 && all (\ x -> rem n x /= 0) xs
+  where xs = takeWhile (\ y -> y^2 <= n) primes
+
+-- From the lab.
+primes :: [Integer]
+primes = 2 : filter prime [3..10000]
+
+getReverse :: [Integer]
+getReverse = map reversal primes
+
+check4 :: [Integer] -> [Integer] -> [Integer]
+check4 xs ys = if null xs
+                 then ys
+                 else if prime (head xs) 
+                   then check4 (tail xs) (ys ++ [head xs]) 
+                   else check4 (tail xs) ys
+
+-- Exercise 5, time 1 hour
+-- To test if you answer is correct you could check all the sums of 101 primes smaller than the answer. But 
+-- because we get our answer by computing these sums in the first way that would be doing double work.
+prime :: Int -> Bool
+prime n = n > 1 && all (\ x -> rem n x /= 0) xs
+    where xs = takeWhile (\ y -> y^2 <= n) primes
+
+primes :: [Int]
+primes = 2 : filter prime [3..550]
+
+-- Find the next prime for our list of 101 primes
+nextPrime :: Int -> Int
+nextPrime x = if (prime (x + 1)) then (x + 1) else nextPrime (x + 1)
+
+-- Check if the sum of the 101 primes is also a prime. If yes we are done,
+-- if no we try again with the lowest prime discarted and a new highest prime found
+findSum ::[Int] -> Int
+findSum list = if prime (sum list) then (sum list) else findSum ((tail list) ++ [(nextPrime (last list))])
+
+startFinding :: Int
+startFinding = findSum (primes)
 
 -- exercise 6 -------------------------------------------------------:
+-- smallest primes [30031,510511,9699691,223092871,6469693231]
 prime :: Integer -> Bool
 prime n = n > 1 && all (\ x -> rem n x /= 0) xs
       where xs = takeWhile (\ y -> y^2 <= n) primes
