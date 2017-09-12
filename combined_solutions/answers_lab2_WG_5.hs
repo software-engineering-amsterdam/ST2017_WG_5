@@ -17,6 +17,8 @@
 
 import Test.QuickCheck
 import System.Random
+import Data.List
+import Test.QuickCheck
 
 
 -- Random float generator, generates numbers between 1 and 0
@@ -74,4 +76,4 @@ testUniform n =
 		print c
 
 --main :: IO ()
-main = testUniform 10000
+--main = testUniform 10000
