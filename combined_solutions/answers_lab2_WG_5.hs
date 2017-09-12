@@ -136,7 +136,7 @@ testFalseIbans = all (\x -> iban x == False) ibansFalse
 main = print(testFalseIbans)
 
 --length of iban and iban found on https://www.dnb.no/en/business/transaction-banking/international-payments/example-iban.html
---Only first 10, would be taken a lot of time otherwise
+--Only first 10, would have taken a lot of time otherwise
 lengthOfIban = [(24,"AD"),(20,"AT"),(22,"BH"),(16,"BE"),(20,"BA"), (22,"BG"),(21,"HR"),(28,"CY"),(24,"CZ"),(18,"DK"),(20,"EE")]
 ibans = ["AD1200012030200359100100", "AT611904300234573201", "BH67BMAG00001299123456", 
     "BE68539007547034", "BA391290079401028494", "BG80BNBG96611020345678", "HR1210010051863000160"
