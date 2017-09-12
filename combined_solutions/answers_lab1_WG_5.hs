@@ -20,9 +20,14 @@
 --	satisfies a part of its specification, namely creating a powerset of the correct length.
 
 
+-- Exercise 4:
+-- To test this with quicktest, you just check if the random number, which can 
+-- not be negative, is a prime and when that is the case you check if the 
+-- reversal is also a prime.
 
-
-
+-- Exercise 5:
+-- To test if you answer is correct you could check all the sums of 101 primes smaller than the answer. But 
+-- because we get our answer by computing these sums (with smaller primes than in the final answer) in the first way, we would be doing double work.
 
 --  Exercise 7c: Multiple tests can be implemented to test the validity of the luhn checker. If a large set of known valid and invalid luhn numbers is given,
 --	all that needs to be done is to perform the check on these numbers and see wether or not the outcome of the check matches the corresponding value of the
@@ -36,6 +41,7 @@ import Data.List
 import Test.QuickCheck
 import System.Random
 
+-- Exercise 1, time: 2 hours
 -- boundaries for exercise 1
 gen1 :: Gen Int
 gen1 = choose (0,10000)
@@ -76,13 +82,13 @@ test3 n = leftHand3 n == rightHand3 n
 --main = quickCheck $ forAll gen1 test3
 
 
--- exercise 2 -------------------------------------------------------:
+-- exercise 2 , time: 2 hour -------------------------------------------------------:
 myTestExercise2 :: Int -> Bool
 myTestExercise2 n = 2 ^ n == length (subsequences [1..n])
 
 --main = quickCheck $ forAll gen2 myTestExercise2
 
--- exercise 3 -------------------------------------------------------:
+-- exercise 3, time: 1 hour -------------------------------------------------------:
 -- it is difficult to test because of the large number that the factorial produces.
 -- This makes is only testable for small(er) numbers
 -- You are only testing a part of the specification. 
@@ -97,10 +103,6 @@ test4 n = length(perms([1..n])) == product([1..n])
 --main = quickCheck $forAll gen1 test4
 
 -- exercise 4 time: 3 hours -----------------------------------------:
--- To test this with quicktest, you just check if the random number, which can 
--- not be negative, is a prime and when that is the case you check if the 
--- reversal is also a prime.
-
 -- From the lab.
 reversal :: Integer -> Integer
 reversal = read . reverse . show
@@ -124,9 +126,7 @@ check4 xs ys = if null xs
                    then check4 (tail xs) (ys ++ [head xs]) 
                    else check4 (tail xs) ys
 
--- Exercise 5, time 1 hour
--- To test if you answer is correct you could check all the sums of 101 primes smaller than the answer. But 
--- because we get our answer by computing these sums in the first way that would be doing double work.
+-- Exercise 5, time: 1 hour
 prime :: Int -> Bool
 prime n = n > 1 && all (\ x -> rem n x /= 0) xs
     where xs = takeWhile (\ y -> y^2 <= n) primes
@@ -146,7 +146,7 @@ findSum list = if prime (sum list) then (sum list) else findSum ((tail list) ++ 
 startFinding :: Int
 startFinding = findSum (primes)
 
--- exercise 6 -------------------------------------------------------:
+-- exercise 6, time: 3 hours -------------------------------------------------------:
 -- smallest primes [30031,510511,9699691,223092871,6469693231]
 prime :: Integer -> Bool
 prime n = n > 1 && all (\ x -> rem n x /= 0) xs
@@ -157,9 +157,8 @@ primes = 2 : filter prime [3..]
 notprimes = filter (not . prime) (map ((+1) . product) [take n primes | n <- [1..10]])
 --main = print(notprimes)
 
--- exercise 7 a ----------------------- The Luhn Formula --------------:
 
-
+-- exercise 7 a, time: 2 hours ----------------------- The Luhn Formula --------------:
 -- Create a list representation of integers by 'biting off' every first digit using modulo 10.
 -- https://stackoverflow.com/questions/3989240/int-int-convert
 intToList :: Int -> [Int]
@@ -194,7 +193,7 @@ luhn checkdigits = (prepareComputations checkdigits) `mod` 10 == 0
 
 --main = print (luhn 5519760048192084)
 
--- exercise 7 b ------------------------------------------------------:
+-- exercise 7 b, time: 2 hours ------------------------------------------------------:
 
 isAmericanExpress :: Int -> Bool
 isAmericanExpress digits = ((head (intToList digits) == 3) && ((intToList digits)!!1 `elem` [4,7])) && (luhn digits) && (length (intToList digits) == 15)
@@ -213,7 +212,7 @@ isVisa digits = (head (intToList digits) == 4) && (luhn digits) && (length (intT
 --main = print (isVisa 4539315692581881)
 --main = print (isVisa 378787355568920)
 
--- exercise 7 c -----------------------------------------------------:
+-- exercise 7 c, time: 3 hours -----------------------------------------------------:
 tenPseudorandomNumbers :: Int -> Int -> [Int]
 tenPseudorandomNumbers seed num_test = take num_test . randomRs (100000000000000, 999999999999999) . mkStdGen $ seed
 
@@ -262,3 +261,42 @@ checkLuhnsFalse seed num = map luhn (createFalseLuhns seed num)
 
 --main = print(checkLuhnsFalse 1078593479 1000)
 --main = print(checkLuhns 1078593478 1000)
+
+-- Exercise 8, time: 5 hours
+data Boy = Matthew | Peter | Jack | Arnold | Carl deriving (Eq, Show)
+
+boys = [Matthew, Peter, Jack, Arnold, Carl]
+
+-- The 'formulas' that describe which boy accuses who
+accuses :: Boy -> Boy -> Bool
+accuses Matthew x = not (x == Matthew) && not (x == Carl) 
+accuses Peter x = x == Matthew || x == Jack
+accuses Jack x = not (accuses Matthew x) && not (accuses Peter x)
+accuses Arnold  x = accuses Matthew x /= accuses Peter x
+accuses Carl x = not (accuses Arnold x)
+
+-- Check for each boy if they are accused by someone, if yes add the accuser to list
+-- if no then continue with remaining boys
+checkAccusement :: Boy -> [Boy] -> [Boy] -> [Boy]
+checkAccusement x xs ys = if null xs
+                            then ys
+                            else if accuses (head xs) x
+                            then checkAccusement x (tail xs) ([head xs] ++ ys)
+                            else checkAccusement x (tail xs) ys
+
+accusers :: Boy -> [Boy]
+accusers x = checkAccusement x boys []
+
+-- Because there is only one possibility where 3 people are correct according to the 
+-- teacher the boy with 3 accusers will be found guilty. So we check for each person how 
+-- many accusers he has untill we find the one with 3 accusers.
+checkGuilty :: Boy -> [Boy] -> [Boy]
+checkGuilty x xs = if length (accusers x) == 3 then [x] else checkGuilty (head xs) (tail xs)
+
+-- Try and find the guilty person by using checkGuilty
+guilty :: [Boy]
+guilty = checkGuilty (head boys) (tail boys)
+
+-- Because only one person is guilty, the 3 people who are accusing are honest
+honest :: [Boy]
+honest = accusers (head guilty)

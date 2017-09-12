@@ -19,7 +19,12 @@ import Test.QuickCheck
 import System.Random
 import Data.List
 import Test.QuickCheck
+import Data.Char (ord)
 
+import Data.Array.ST
+import Control.Monad
+import Control.Monad.ST
+import Data.STRef
 
 -- Random float generator, generates numbers between 1 and 0
 probs :: Int -> IO [Float]
@@ -77,3 +82,164 @@ testUniform n =
 
 --main :: IO ()
 --main = testUniform 10000
+
+
+
+---assignment 2------Recognizing triangl------------------- 70 min
+data Shape = NoTriangle | Equilateral 
+           | Isosceles  | Rectangular | Other deriving (Eq,Show)
+
+triangle :: Integer -> Integer -> Integer -> Shape
+triangle a b c  
+    | a^2 + b^2 == c^2 = Rectangular
+    | a == b && b == c && c == a = Equilateral
+    | (a == b || b == c || a == c) && (a+b > c) && (b+c > a) && (a+c>b) = Isosceles
+    | (a+b > c) && (b+c > a) && (a+c>b) = Other
+    | otherwise = NoTriangle
+
+test:: Bool
+test = all (\(a,b,c,shape) -> triangle a b c == shape) tests
+
+tests :: [(Integer, Integer, Integer, Shape)]
+tests = [(3,4,5,Rectangular),(5,12,13, Rectangular),(3,3,3, Equilateral), 
+    (6,6,6,Equilateral), (1,1,1000,NoTriangle),(1,1,-1,NoTriangle), (5,5,3,Isosceles)]
+
+---assignment 3--------------------------------------------
+---assignment 4--------------------------------------------
+
+-- Assignment 4 (3 hours): After creating the isPermutation test, we can now define some properties to test for this function.
+-- Properties to test:
+-- Where a = [1, 2, 3]
+-- b = [3, 2, 1]
+-- c = [1, 3, 2]
+
+-----------------------------------------------------------------------------------------------------------------
+-- Symmetry: isPermutation a b == isPermutation b a
+
+-- Commutativity: (isPermutation a b AND isPermutation a  c) AND isPermutation b c ==
+-- (isPermutation a c AND isPermutation b c) AND isPermutation a b
+
+-- Reflexive: isPermutation a a == isPermutation a a
+
+-- Transitivety: if isPermutation a b AND isPermutation a c THEN isPermutation b c
+------------------------------------------------------------------------------------------------------------------
+
+-- We can generate our own permutation lists if we can assume there are no duplicates in the list.
+-- To test the properties, we simply get a random list, create 1 or 2 permutations, and check the predicates
+-- defined above (the property definition). If the properties hold, then all tests should return true. 
+
+-- Property order (from strongest to weakest):
+--		Distributivity
+--		Transitivety
+--		Commutativity
+--		Symmetry
+--		Reflexive
+-----------------------------------------------------------------------------------------------------------------
+-- We automated the tests using quickCheck, every test yields True which means the defined properties are correct.
+-----------------------------------------------------------------------------------------------------------------
+-- This function tests wether list 1 is a permutation of list 2, it checks for each element in list 1 if it is present
+-- in list 2. it then removes both elements from the lists and continues checking, if one list is empty and the other one
+-- isnt, we failed, if both lists are empty, we succeded and a permutation is found
+isPermutation [] [_] = False
+isPermutation [_] [] = False
+isPermutation [] [] = True
+isPermutation list1 list2 = 
+	do
+		let x = head list1
+		case elemIndex x list2 of 
+			Just n -> do
+						let a = tail list1
+						let b = let (ys,zs) = splitAt n list2   in   ys ++ (tail zs)
+						isPermutation a b
+			Nothing -> False
+
+-- The following functions are used to test the defined properties, they should return true if it holds for a test case.
+-- We also test wether or not the permutations are actual permutations of the original list (which they are since we create
+-- them ourselves)
+
+-- Symmetry: isPermutation a b == isPermutation b a
+prop_symm :: [Int] -> Bool
+prop_symm a = let
+	b = fst ( shuffle a (mkStdGen (head a)))
+	in ((isPermutation a b == isPermutation b a) //> (isPermutation a b))
+
+
+-- Commutativity: (isPermutation a b AND isPermutation a  c) AND isPermutation b c ==
+-- (isPermutation a c AND isPermutation b c) AND isPermutation a b
+prop_comm :: [Int] -> Bool
+prop_comm a = let
+	b = fst ( shuffle a (mkStdGen (head a)))
+	c = fst ( shuffle a (mkStdGen (head b)))
+	in (((isPermutation a b && isPermutation a c) && isPermutation b c) && ((isPermutation a c && isPermutation b c) && isPermutation a b) //> (isPermutation a b))
+
+
+-- Reflexive: isPermutation a a == isPermutation a a
+prop_ref :: [Int] -> Bool
+prop_ref a = let
+	b = fst ( shuffle a (mkStdGen (head a)))
+	in ((isPermutation b b && isPermutation b a) //> (isPermutation b b))
+
+-- Transitivety: if isPermutation a b AND isPermutation a c THEN isPermutation b c
+prop_trans :: [Int] -> Bool
+prop_trans a = let
+	b = fst ( shuffle a (mkStdGen (head a)))
+	c = fst ( shuffle a (mkStdGen (head b)))
+	in (((isPermutation a b && isPermutation c a) && isPermutation b c) //> (isPermutation a b))
+
+--main = do
+--	print ("Symmetry Property:")
+--	quickCheck prop_symm
+--	print ("Commutativity Property:")
+--	quickCheck prop_comm
+--	print ("Reflexivity Property:")
+--	quickCheck prop_ref
+--	print ("Transetivity Property:")
+--	quickCheck prop_trans
+---assignment 5--------------------------------------------
+---assignment 6---------IBAN-------------------------------4 hours
+iban :: String -> Bool
+iban x = 
+    let 
+        i = replace 4 x
+        country = take 2 x
+        lengthX = length x
+    in toInt(replChar i) `mod` 97 == 1 && getLength country lengthOfIban  == lengthX
+  
+--https://stackoverflow.com/questions/20667478/haskell-string-int-type-conversion  
+toInt::String -> Integer
+toInt x = read x :: Integer
+
+--with help from:
+--https://stackoverflow.com/questions/23974282/haskell-search-list
+getLength:: String -> [(Int, String)] -> Int
+getLength x [] = -1
+getLength x (y:ys) = if x == snd y then fst y else getLength x ys
+
+replace::Int -> String -> [Char]
+replace n x
+    | n == 0 = x
+    | otherwise = replace (n-1) (tail x ++ [head x])
+
+replChar:: String -> String
+replChar [] = []
+replChar (x:xs) = if ord(x) >= 65 then show (ord x - 55) ++ replChar xs else x:replChar xs
+
+testCorrectIbans:: Bool
+testCorrectIbans = all (\x -> iban x == True) ibans
+
+
+testFalseIbans:: Bool
+testFalseIbans = all (\x -> iban x == False) ibansFalse
+
+main = print(testFalseIbans)
+
+--length of iban and iban found on https://www.dnb.no/en/business/transaction-banking/international-payments/example-iban.html
+--Only first 10, would have taken a lot of time otherwise
+lengthOfIban = [(24,"AD"),(20,"AT"),(22,"BH"),(16,"BE"),(20,"BA"), (22,"BG"),(21,"HR"),(28,"CY"),(24,"CZ"),(18,"DK"),(20,"EE")]
+ibans = ["AD1200012030200359100100", "AT611904300234573201", "BH67BMAG00001299123456", 
+    "BE68539007547034", "BA391290079401028494", "BG80BNBG96611020345678", "HR1210010051863000160"
+    , "CY17002001280000001200527600", "CZ6508000000192000145399", "DK5000400440116243", "EE382200221020145685"]
+--false iban, by changing the length or a number at the end. 
+ibansFalse = ["AD1200012030200359100101", "AT611904300234573202", "BH67BMAG00001299123453", 
+    "BE68539007547035", "BA391290079401028496", "BG80BNBG96611020345677", "HR1210010051863000168"
+    , "CY17002001280000001200527606", "CZ6508000000192000145395", "DK5000400440116244", "EE382200221020145684"]
