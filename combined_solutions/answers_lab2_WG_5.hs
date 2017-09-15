@@ -104,7 +104,57 @@ tests :: [(Integer, Integer, Integer, Shape)]
 tests = [(3,4,5,Rectangular),(5,12,13, Rectangular),(3,3,3, Equilateral), 
     (6,6,6,Equilateral), (1,1,1000,NoTriangle),(1,1,-1,NoTriangle), (5,5,3,Isosceles)]
 
----assignment 3--------------------------------------------
+---assignment 3-------------------------------------------- (8 hours, mostly figuring out how to properly sort the properties.)
+-- From the labs
+infix 1 --> 
+
+(-->) :: Bool -> Bool -> Bool
+p --> q = (not p) || q
+
+forall :: [a] -> (a -> Bool) -> Bool
+forall = flip all
+
+-- From the labs.
+stronger, weaker :: [a] -> (a -> Bool) -> (a -> Bool) -> Bool
+stronger xs p q = forall xs (\ x -> p x --> q x)
+weaker   xs p q = stronger xs q p 
+
+-- The four properties from the workshop.
+first :: Int -> Bool
+first x = (even x && x > 3)
+
+second :: Int -> Bool
+second x = (even x || x > 3)
+
+third :: Int -> Bool
+third x = ((even x && x > 3) || even x)
+
+-- same as third?
+--fourth :: Int -> Bool
+--fourth x = ((even x && x > 3) || even x)
+
+-- Using bubblesort to sort the list with the strongest property first and 
+-- weakest property last.
+-- source: https://smthngsmwhr.wordpress.com/2012/11/09/sorting-algorithms-in-haskell/
+bubblesort'iter :: [((Int -> Bool), String)] -> [((Int -> Bool), String)]
+bubblesort'iter (x:y:xs)
+    | (stronger [(-10)..10] (fst x) (fst y)) = x : bubblesort'iter (y:xs)
+    | otherwise = y : bubblesort'iter (x:xs)
+bubblesort'iter (x) = (x)
+
+bubblesort' :: [((Int -> Bool), String)] -> Int -> [((Int -> Bool), String)]
+bubblesort' xs i 
+    | i == (length xs) = xs
+    | otherwise = bubblesort' (bubblesort'iter xs) (i + 1) 
+ 
+bubblesort :: [((Int -> Bool), String)] -> [((Int -> Bool), String)]
+bubblesort xs = bubblesort' xs 0
+
+-- Uncomment the main function to get the list of properties, strongest first.
+--main :: [String]
+--main = map snd (bubblesort [(first, "first"), (second, "second"), (third, "third"), (even, "even")])
+
+
 ---assignment 4--------------------------------------------
 
 -- Assignment 4 (3 hours): After creating the isPermutation test, we can now define some properties to test for this function.
