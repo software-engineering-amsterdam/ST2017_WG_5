@@ -5,7 +5,7 @@ import Data.List
 import System.Random
 import Test.QuickCheck
 -- import Lecture3
-
+-- 2 hours
 contradiction :: Form -> Bool
 contradiction x = not (satisfiable x)
 
