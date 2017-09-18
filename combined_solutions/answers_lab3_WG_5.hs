@@ -28,10 +28,12 @@ start :: String -> Form
 start a = head (parse a)
 
 
---main = print (contradiction (start "^(1 -1)"))
---main = print (tautology (start "|(1 -2)"))
---main = print (entails (start "|(1 2)")(start "|(1 2)"))
---main = print (entails (start "|(1 2)")(start "|(1 2)"))
 main = do
-	print "Hey dingen"
-	print "dingen 2"
+    print ("p ^ q entails p v q")
+    print(entails (parseHelp "*(1 2)") (parseHelp "+(1 2)"))
+    print("-(p ^ q) equiv -p v -q")
+    print(equiv (parseHelp "-*(1 2)") (parseHelp "+(-1 -2)"))
+    print("contradiction -p ^ p")
+    print(contradiction(parseHelp "*(1 -1)"))
+    print("tautology p v -p")
+    print(tautology (parseHelp "+(1 -1)"))
