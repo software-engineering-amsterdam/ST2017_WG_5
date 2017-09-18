@@ -1,5 +1,9 @@
-import Lecture3
+-- Jordy Bottelier
+-- Dennis Kruidenberg
+-- Lars Lokhoff
+-- Timo Dobber(kroket)
 
+import Lecture3
 
 -- Assignment 1, time spent creating code: 30 minutes. Note that we modified the lexer to work with the | and ^ operators.
 
@@ -23,27 +27,11 @@ equiv x y = tautology (Equiv x y)
 start :: String -> Form
 start a = head (parse a)
 
+
 --main = print (contradiction (start "^(1 -1)"))
 --main = print (tautology (start "|(1 -2)"))
 --main = print (entails (start "|(1 2)")(start "|(1 2)"))
 --main = print (entails (start "|(1 2)")(start "|(1 2)"))
 main = do
-	print "Contradiction ^(1 -1): "
-	print (contradiction (start "^(1 -1)"))
-	print "Contradiction ^(1 -1): "
-	print (contradiction (start "^(1 -1)"))
-
-	print "Tautology ^(1 -1): "
-	print (tautology (start "|(1 -2)"))
-	print "Tautology ^(1 -1): "
-	print (tautology (start "|(1 -2)"))
-
-	print "Entails ^(1 -1): "
-	print (entails (start "|(1 2)")(start "|(1 2)"))
-	print "Entails ^(1 -1): "
-	print (entails (start "|(1 2)")(start "|(1 2)"))
-
-	print "Equiv ^(1 -1): "
-	print (equiv (start "|(1 2)")(start "|(1 2)"))
-	print "Equiv^(1 -1): "
-	print (equiv (start "|(1 2)")(start "|(1 2)"))
+	print "Hey dingen"
+	print "dingen 2"
