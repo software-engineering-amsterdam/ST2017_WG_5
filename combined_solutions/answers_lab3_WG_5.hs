@@ -32,6 +32,3 @@ start a = head (parse a)
 --main = print (tautology (start "|(1 -2)"))
 --main = print (entails (start "|(1 2)")(start "|(1 2)"))
 --main = print (entails (start "|(1 2)")(start "|(1 2)"))
-main = do
-	print "Hey dingen"
-	print "dingen 2"
