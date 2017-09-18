@@ -104,7 +104,57 @@ tests :: [(Integer, Integer, Integer, Shape)]
 tests = [(3,4,5,Rectangular),(5,12,13, Rectangular),(3,3,3, Equilateral), 
     (6,6,6,Equilateral), (1,1,1000,NoTriangle),(1,1,-1,NoTriangle), (5,5,3,Isosceles)]
 
----assignment 3--------------------------------------------
+---assignment 3-------------------------------------------- (8 hours, mostly figuring out how to properly sort the properties.)
+-- From the labs
+infix 1 --> 
+
+(-->) :: Bool -> Bool -> Bool
+p --> q = (not p) || q
+
+forall :: [a] -> (a -> Bool) -> Bool
+forall = flip all
+
+-- From the labs.
+stronger, weaker :: [a] -> (a -> Bool) -> (a -> Bool) -> Bool
+stronger xs p q = forall xs (\ x -> p x --> q x)
+weaker   xs p q = stronger xs q p 
+
+-- The four properties from the workshop.
+first :: Int -> Bool
+first x = (even x && x > 3)
+
+second :: Int -> Bool
+second x = (even x || x > 3)
+
+third :: Int -> Bool
+third x = ((even x && x > 3) || even x)
+
+-- same as third?
+--fourth :: Int -> Bool
+--fourth x = ((even x && x > 3) || even x)
+
+-- Using bubblesort to sort the list with the strongest property first and 
+-- weakest property last.
+-- source: https://smthngsmwhr.wordpress.com/2012/11/09/sorting-algorithms-in-haskell/
+bubblesort'iter :: [((Int -> Bool), String)] -> [((Int -> Bool), String)]
+bubblesort'iter (x:y:xs)
+    | (stronger [(-10)..10] (fst x) (fst y)) = x : bubblesort'iter (y:xs)
+    | otherwise = y : bubblesort'iter (x:xs)
+bubblesort'iter (x) = (x)
+
+bubblesort' :: [((Int -> Bool), String)] -> Int -> [((Int -> Bool), String)]
+bubblesort' xs i 
+    | i == (length xs) = xs
+    | otherwise = bubblesort' (bubblesort'iter xs) (i + 1) 
+ 
+bubblesort :: [((Int -> Bool), String)] -> [((Int -> Bool), String)]
+bubblesort xs = bubblesort' xs 0
+
+-- Uncomment the main function to get the list of properties, strongest first.
+--main :: [String]
+--main = map snd (bubblesort [(first, "first"), (second, "second"), (third, "third"), (even, "even")])
+
+
 ---assignment 4--------------------------------------------
 
 -- Assignment 4 (3 hours): After creating the isPermutation test, we can now define some properties to test for this function.
@@ -195,7 +245,97 @@ prop_trans a = let
 --	quickCheck prop_ref
 --	print ("Transetivity Property:")
 --	quickCheck prop_trans
----assignment 5--------------------------------------------
+
+-------------------------------------------------------------------
+-- Recognizing and generating derangements, time: 6 hours
+-- Properties: 
+--      Reflexive: isDerangement [1,2,3][3,1,2] = isDerangement [1,2,3][3,1,2]
+--      Commutative: isDerangement [1,2,3][3,1,2] = isDerangement [3,1,2][1,2,3]
+-- Well chosen integer lists:
+--      Empty list [] -> will not succeed because there are no elements
+--      List with 1 element [1] -> will not succeed because there are no permutations
+--      List with the same integeres [2,2,2] -> will not succeed because all permutations are still the same lists
+-- List of properties strong -> weak:
+-- commutative, reflexive     
+infix 1 --> 
+
+(-->) :: Bool -> Bool -> Bool
+p --> q = (not p) || q
+
+-- The reflexive property, checked with quickCheck
+reflexive_prop :: [Int] -> [Int] -> Bool
+reflexive_prop x y = isDerangement x y --> isDerangement x y
+
+-- The commutative property, checked with quickCheck
+commutative_prop :: [Int] -> [Int] -> Bool
+commutative_prop x y = isDerangement x y --> isDerangement y x
+
+perms :: [a] ->[[a]]
+perms [] = [[]]
+perms (x:xs) = concat (map (insrt x) (perms xs)) where
+    insrt x [] = [[x]]
+    insrt x (y:ys) = (x:y:ys) : map (y:) (insrt x ys)
+
+-- Loop over all elements in both lists and check if they are the same for each position
+isDerangement2 :: [Int] -> [Int] -> Bool
+isDerangement2  [] [] = True
+isDerangement2 (x:xs) (y:ys) = if x == y 
+                            then False 
+                            else if null xs || null ys
+                            then isDerangement2 xs ys
+                            else True
+
+-- Check if the 2 lists are perms, if yes check if it is a derangement
+isDerangement :: [Int] -> [Int] -> Bool
+isDerangement xs ys = if isPermutation xs ys
+                        then isDerangement2 xs ys
+                        else False
+
+-- Loop over permutations and check for each if it is a derangement
+findDerans2 :: [Int] -> [[Int]] -> [[Int]] -> [[Int]]
+findDerans2 original perms derans = if null perms
+                                    then derans
+                                    else if isDerangement original (head perms)
+                                    then findDerans2 original (tail perms) (derans ++ [(head perms)])
+                                    else findDerans2 original (tail perms) derans
+
+-- Keep looking for the first derangement, if its found add to list and continue with
+-- function above untill all perms are checked
+findDerans :: [Int] -> [[Int]] -> [[Int]]
+findDerans original perms = if null perms
+                                    then [[0]]
+                                    else if isDerangement original (head perms)
+                                    then findDerans2 original (tail perms) [] ++ [(head perms)]
+                                    else findDerans original (tail perms)
+
+-- To find the derangements, create the permutations of the list and start looking!
+deran :: Int -> [[Int]]
+deran x = findDerans [1..(x - 1)] (perms [1..(x - 1)])
+
+----------------------------------------------------------------
+-- ROT13, time: 5 hours
+-- Specification: {string str} str2 = encode str {rot13 str2} 
+-- To encode a string with rot13 we simply, depending on if the letter is 
+-- in caps or not, substract the ascii value of the A or a, add 13, mod 26 and then add the ascii
+encode :: String -> String
+encode [] = []
+encode (x:xs) = if (ord(x) >= 65 && ord(x) <= 90)
+                  then [chr ((((ord x - 65) + 13) `mod` 26) + 65)] ++ encode xs
+                else if (ord(x) >= 97 && ord(x) <= 122)
+                  then [chr ((((ord x - 97) + 13) `mod` 26) + 97)] ++ encode xs
+                  else x:encode xs
+
+-- To check if the encodes string is encoded correctly, we have to compare the encoded string
+-- with the original string and check if the ascii value is 13 larger (mode 26 because we start at the
+-- beginning of the alphabet if we reach the end).
+prop_rot13 :: String -> String -> Bool
+prop_rot13 "" "" = True
+prop_rot13 (x:xs) (y:ys) = if (ord y) == (((((ord x - 65) + 13) `mod` 26) + 65)) 
+                            then prop_rot13 xs ys
+                            else if (ord y) == ((((ord x - 97) + 13) `mod` 26) + 97)
+                            then prop_rot13 xs ys
+                            else False
+
 ---assignment 6---------IBAN-------------------------------4 hours
 iban :: String -> Bool
 iban x = 
