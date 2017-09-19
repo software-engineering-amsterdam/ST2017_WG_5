@@ -95,7 +95,6 @@ tester x = if length(parse x) > 0 then show (head (parse x)) == x
 
 -- boundaries for exercise 1
 
-                        -- Exercise CNF, time:
 deMorgan :: Form -> Form
 deMorgan f@(Prop x) = f
 deMorgan f@(Neg (Prop x)) = f
@@ -115,9 +114,9 @@ deMorgan2 f g = Dsj [f, g]
 
 
 toCNF :: Form -> IO Form
-toCNF f = do 
-    a <- (deMorgan (nnf (arrowfree f)))
-    return a
+toCNF f = 
+    return (deMorgan (nnf (arrowfree f)))
+
 
 
 
@@ -144,43 +143,47 @@ genProposition = do
     f <- (genPropHelper a)
     return f
 
+-- Generates the entire proposition based on the input Int, 
+-- Int specifies the size of the proposition (ranges from 1 to 6), and is counted down.
 genPropHelper :: Int -> IO Form
--- base case
+-- base case, if the counter reaches 0 return a prop
 genPropHelper 0 = do
     a <- genPropInt
     return (Prop a)
 
+-- Generate a random number between 1 and 4, and create a proposition that matches the number
 genPropHelper counter = do
     a <- genOp
+    prop1 <- (genPropHelper (counter - 1))
+    prop2 <- (genPropHelper (counter - 1))
     case a of 
         1 -> do
-            prop1 <- (genPropHelper (counter - 1))
-            prop2 <- (genPropHelper (counter - 1))
             return (Cnj [prop1, prop2])
         2 -> do
-            prop1 <- (genPropHelper (counter - 1))
-            prop2 <- (genPropHelper (counter - 1))
             return (Dsj [prop1, prop2])
         3 -> do
-            prop1 <- (genPropHelper (counter - 1))
-            prop2 <- (genPropHelper (counter - 1))
             return (Impl prop1 prop2)
         4 -> do
-            prop1 <- (genPropHelper (counter - 1))
-            prop2 <- (genPropHelper (counter - 1))
             return (Equiv prop1 prop2)
 
-cnfTester :: IO()
-cnfTester = do 
+-- Test if the CNF generator works, generate proposition and test if they are equivalent
+cnfTester :: Int -> Int -> Int -> IO()
+cnfTester 0 a b = do
+    print "Cases Good: "
+    print (show a)
+    print "Cases Bad: "
+    print (show b)
+cnfTester num_tests counter_good counter_bad = do 
     a <- genProposition
     b <- toCNF a
-    print (a == b)
-
+    let result = tautology(Equiv a b)
+    if result then cnfTester (num_tests - 1) (counter_good + 1) (counter_bad)
+        else cnfTester (num_tests - 1) (counter_good) (counter_bad + 1)
+    
 
 --randomProp :: [Char]
 --randomProp = "(" ++ (show 1) ++ getOp ++ (show 3) ++ ")"
 --randomProp = getOp ++ "(" ++ (show 1) ++ (show 3) ++ ")"
 
-main = print cnfTester
---main = print (parse "(+(-7 4)<=>(2==>-8))")
+main = cnfTester 100 0 0
 
