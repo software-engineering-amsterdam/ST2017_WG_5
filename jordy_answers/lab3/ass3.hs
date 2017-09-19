@@ -1,5 +1,6 @@
 import Lecture3
-
+import Test.QuickCheck
+import System.Random
 
 -- Assignment 1, time spent: 2 hours. Note that we modified the lexer to work with the | and ^ operators.
 
@@ -71,10 +72,9 @@ tester x = if length(parse x) > 0 then show (head (parse x)) == x
 -- Cases for the program:
 -- 
 -- Correct input format:
--- P = O1(x O2 y) | P = x
+-- P = O1(P O2 P) | P = Digit
 -- O1 = operator (+, *)
 -- O2 = operator (<=>, ==>)
--- x/y = Any digit | P
 -- 
 -- A negation can be placed anywere (if its placed behind the proposition it is skipped), the negation can only not be placed at the place of the operator.
 -- O1 or O2 must be defined (not both), if it is not defined the program must error
@@ -91,4 +91,30 @@ tester x = if length(parse x) > 0 then show (head (parse x)) == x
 -- The incorrect format tests included: brackets mismatched / operators on wrong places / missing operators
 --
 -- Results:
--- Every test case is passed, the test cases that should return true returned true, and the test cases that should return false returned false.  
+-- Every test case is passed, the test cases that should return true returned true, and the test cases that should return false returned false.
+
+-- boundaries for exercise 1
+
+getCharacter :: Int -> ([Char], Int)
+getCharacter a
+    | a == 1 = ("*", a)
+    | a == 2 = ("+", a)
+    | a == 3 = ("==>", a)
+    | a == 4 = ("<=>", a)
+
+genOp :: Gen Int
+genOp = choose (1,4)
+
+getOp :: ([Char], Int)
+getOp = do
+    let a = genOp
+    getCharacter a
+
+    
+
+--randomProp :: [Char]
+--randomProp = "(" ++ (show 1) ++ getOp ++ (show 3) ++ ")"
+--randomProp = getOp ++ "(" ++ (show 1) ++ (show 3) ++ ")"
+
+main = print (getOp)
+
