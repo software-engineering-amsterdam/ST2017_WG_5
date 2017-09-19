@@ -5,7 +5,7 @@
 
 import Lecture3
 
--- Assignment 1, time spent creating code: 30 minutes. Note that we modified the lexer to work with the | and ^ operators.
+-- Assignment 1, time spent: 2 hours. Note that we modified the lexer to work with the | and ^ operators.
 
 -- a is a contradiction if it is not satisfiable
 contradiction :: Form -> Bool
@@ -47,7 +47,31 @@ main = do
     print("not tautology p v -q")
     print(tautology (parseHelp "+(1 -2)"))
 
--- Assignment 2; time spent x hours:
+
+tester :: String -> Bool
+tester x = if length(parse x) > 0 then show (head (parse x)) == x
+            else False
+
+-- Assignment 2, time spent: 2 hours
+
+--main = do
+--    print "These tests should return true:"
+--    print(tester (show(Equiv (Impl p q) (Impl (Neg q) (Neg p)))))
+--    print(tester (show(Equiv (Impl p q) (Impl (Neg p) (Neg q)))))
+--    print(tester (show(Impl (Cnj [Impl p q, Impl q r]) (Impl p r))))
+--    print(tester (show (Cnj [p, q])))
+--    print(tester (show(Equiv (Cnj[Dsj[p,q],Dsj[Neg p,r]]) (Dsj[q,r]))))
+--    print(tester (show(Cnj[Dsj[p,q],Dsj[q,r],Cnj[p,r]])))
+--    print (tester "2")
+
+--    print "These tests should return false:"
+--    print (tester "*1 2)")
+--    print (tester "")
+--    print (tester "*(1 2")
+--    print (tester "1 => 3")
+--    print (tester "(1 <=> 3 2)")
+--    print (tester "*(1 <=> 3)")
+
 -- Cases for the program:
 -- 
 -- Correct input format:
@@ -61,6 +85,14 @@ main = do
 -- If the input format is correct, the parser produces a list in which the first element is the created Form. If the parser works correctly, the output 
 -- converted to a string representation should be the same as the input. To prevent ourselves from having to deal with spacing mismatches, we use a tokenized input
 -- format to test the parser. When calling the show function for such an input, it creates the correct string representation for such a proposition. The parser is
--- called on the string, created by show(), and the output is checked against the input. 
+-- called on the string, created by show(), and the output is checked against the input. The tokenized inputs are copied from the lecture slides
 --
--- If the input format is not correct, the output should be an empty list, or an error message.
+-- If the input format is not correct, the output should be an empty list. 
+--
+-- We created a tester function that compares given string input to the parser output, and we use it to test the parser functionality.
+-- We created test cases with correct input format using all possible operations, to check if the output is correct when the
+-- input is correct. Then we created test cases with incorrect formatting, to test if faulty input is caught.
+-- The incorrect format tests included: brackets mismatched / operators on wrong places / missing operators
+--
+-- Results:
+-- Every test case is passed, the test cases that should return true returned true, and the test cases that should return false returned false.  
