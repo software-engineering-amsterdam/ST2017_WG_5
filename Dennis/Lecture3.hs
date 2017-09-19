@@ -190,8 +190,6 @@ lexer (c:cs) | isSpace c = lexer cs
              | isDigit c = lexNum (c:cs) 
 lexer ('(':cs) = TokenOP : lexer cs
 lexer (')':cs) = TokenCP : lexer cs
-lexer ('^':cs) = TokenCnj : lexer cs
-lexer ('|':cs) = TokenDsj : lexer cs
 lexer ('*':cs) = TokenCnj : lexer cs
 lexer ('+':cs) = TokenDsj : lexer cs
 lexer ('-':cs) = TokenNeg : lexer cs 
@@ -201,19 +199,6 @@ lexer (x:_) = error ("unknown token: " ++ [x])
 
 lexNum cs = TokenInt (read num) : lexer rest
      where (num,rest) = span isDigit cs
-
-lexer2 :: String -> [Token]
-lexer2 [] = []
-lexer2 (c:cs) | isSpace c = lexer cs
-             | isDigit c = lexNum (c:cs) 
-lexer2 ('(':cs) = TokenOP : lexer cs
-lexer2 (')':cs) = TokenCP : lexer cs
-lexer2 ('^':cs) = TokenCnj : lexer cs
-lexer2 ('|':cs) = TokenDsj : lexer cs
-lexer2 ('-':cs) = TokenNeg : lexer cs 
-lexer2 ('=':'=':'>':cs) = TokenImpl : lexer cs
-lexer2 ('<':'=':'>':cs) = TokenEquiv : lexer cs
-lexer2 (x:_) = error ("unknown token: " ++ [x])
 
 type Parser a b = [a] -> [(b,[a])]
 

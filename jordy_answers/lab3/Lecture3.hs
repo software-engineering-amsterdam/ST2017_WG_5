@@ -190,6 +190,8 @@ lexer (c:cs) | isSpace c = lexer cs
              | isDigit c = lexNum (c:cs) 
 lexer ('(':cs) = TokenOP : lexer cs
 lexer (')':cs) = TokenCP : lexer cs
+lexer ('^':cs) = TokenCnj : lexer cs
+lexer ('|':cs) = TokenDsj : lexer cs
 lexer ('*':cs) = TokenCnj : lexer cs
 lexer ('+':cs) = TokenDsj : lexer cs
 lexer ('-':cs) = TokenNeg : lexer cs 
@@ -251,7 +253,7 @@ parseEquiv (TokenEquiv : tokens) =
 parseEquiv tokens = []
 
 parse :: String -> [Form]
-parse s = [ f | (f,_) <- parseForm (lexer2 s) ]
+parse s = [ f | (f,_) <- parseForm (lexer s) ]
 
 arrowfree :: Form -> Form 
 arrowfree (Prop x) = Prop x 

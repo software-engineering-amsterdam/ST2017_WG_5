@@ -20,30 +20,25 @@ equiv :: Form -> Form -> Bool
 equiv x y = tautology (Equiv x y)
 
 -- parse a string to a form, used by the formulas
-start :: String -> Form
-start a = head (parse a)
+parseHelp :: String -> Form
+parseHelp a = head (parse a)
 
---main = print (contradiction (start "^(1 -1)"))
---main = print (tautology (start "|(1 -2)"))
---main = print (entails (start "|(1 2)")(start "|(1 2)"))
---main = print (entails (start "|(1 2)")(start "|(1 2)"))
 main = do
-	print "Contradiction ^(1 -1): "
-	print (contradiction (start "^(1 -1)"))
-	print "Contradiction ^(1 -1): "
-	print (contradiction (start "^(1 -1)"))
-
-	print "Tautology ^(1 -1): "
-	print (tautology (start "|(1 -2)"))
-	print "Tautology ^(1 -1): "
-	print (tautology (start "|(1 -2)"))
-
-	print "Entails ^(1 -1): "
-	print (entails (start "|(1 2)")(start "|(1 2)"))
-	print "Entails ^(1 -1): "
-	print (entails (start "|(1 2)")(start "|(1 2)"))
-
-	print "Equiv ^(1 -1): "
-	print (equiv (start "|(1 2)")(start "|(1 2)"))
-	print "Equiv^(1 -1): "
-	print (equiv (start "|(1 2)")(start "|(1 2)"))
+    print ("p ^ q entails p v q")
+    print(entails (parseHelp "*(1 2)") (parseHelp "+(1 2)"))
+    print("-(p ^ q) equiv -p v -q")
+    print(equiv (parseHelp "-*(1 2)") (parseHelp "+(-1 -2)"))
+    print("contradiction -p ^ p")
+    print(contradiction(parseHelp "*(1 -1)"))
+    print("tautology p v -p")
+    print(tautology (parseHelp "+(1 -1)"))
+    
+    print ("False examples:")
+    print ("p ^ q not entails p ^ r")
+    print(entails (parseHelp "*(1 2)") (parseHelp "^(1 3)"))
+    print("-(p ^ q) not equiv -p v -r")
+    print(equiv (parseHelp "-*(1 2)") (parseHelp "+(-1 -3)"))
+    print("not contradiction -p ^ q")
+    print(contradiction(parseHelp "*(1 -2)"))
+    print("not tautology p v -q")
+    print(tautology (parseHelp "+(1 -2)"))
