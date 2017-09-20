@@ -98,8 +98,6 @@ tester x = if length(parse x) > 0 then show (head (parse x)) == x
 -- Results:
 -- Every test case is passed, the test cases that should return true returned true, and the test cases that should return false returned false.
 
--- boundaries for exercise 1
-
 deMorgan :: Form -> Form
 deMorgan f@(Prop x) = f
 deMorgan f@(Neg (Prop x)) = f
@@ -134,13 +132,15 @@ getCharacter a
 
 
 
--- assignment 4: time spent 4 hour
+-- assignment 4: time spent 5 hour
 genPropInt :: IO Int
 genPropInt = getStdRandom (randomR (-10,10))
 
+-- generate a random number for the operation
 genOp :: IO Int
-genOp = getStdRandom (randomR (1,4))
+genOp = getStdRandom (randomR (1,5))
 
+-- draw a random number for the length of the 
 genCounter :: IO Int
 genCounter = getStdRandom (randomR (0,3))
 
@@ -153,12 +153,14 @@ genProposition = do
 -- Generates the entire proposition based on the input Int, 
 -- Int specifies the size of the proposition (ranges from 1 to 6), and is counted down.
 genPropHelper :: Int -> IO Form
+
 -- base case, if the counter reaches 0 return a prop
 genPropHelper 0 = do
     a <- genPropInt
     return (Prop a)
 
 -- Generate a random number between 1 and 4, and create a proposition that matches the number
+-- 1: conjunction, 2: disjunction, 3: implication, 4: equivalence, 5: a Proposition
 genPropHelper counter = do
     a <- genOp
     prop1 <- (genPropHelper (counter - 1))
@@ -172,8 +174,12 @@ genPropHelper counter = do
             return (Impl prop1 prop2)
         4 -> do
             return (Equiv prop1 prop2)
+        5 -> do
+            x <- genPropInt
+            return (Prop x)
 
 -- Test if the CNF generator works, generate proposition and test if they are equivalent
+-- first int should be the amount of tests you want to perform, the second and third int should be 0
 cnfTester :: Int -> Int -> Int -> IO()
 cnfTester 0 a b = do
     print "Cases Good: "
@@ -184,6 +190,7 @@ cnfTester num_tests counter_good counter_bad = do
     a <- genProposition
     b <- toCNF a
     let result = tautology(Equiv a b)
+    print a
     if result then cnfTester (num_tests - 1) (counter_good + 1) (counter_bad)
         else cnfTester (num_tests - 1) (counter_good) (counter_bad + 1)
     
