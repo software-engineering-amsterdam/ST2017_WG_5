@@ -4,7 +4,7 @@ import System.Random
 import Test.QuickCheck
 import Lecture3
 
--- Exercise CNF, time 8 hours:
+-- Exercise 3 CNF, time 8 hours:
 -- For this exercise we were struggling at first to cope with the
 -- the syntax and way the logic formulas were represented. After
 -- figuring out how to work with them, we thought applying arrowfree
@@ -16,8 +16,8 @@ toCNF :: Form -> Form
 toCNF f = (deMorgan (nnf (arrowfree f)))
 
 deMorgan :: Form -> Form
-deMorgan (Prop x) = Prop f
-deMorgan (Neg (Prop x)) = Neg (Prop f)
+deMorgan (Prop f) = Prop f
+deMorgan (Neg (Prop f)) = Neg (Prop f)
 deMorgan (Cnj fs) = Cnj (map deMorgan fs)
 deMorgan (Dsj []) = Dsj []
 deMorgan (Dsj [f]) = deMorgan f
