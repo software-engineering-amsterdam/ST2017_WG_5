@@ -16,8 +16,8 @@ toCNF :: Form -> Form
 toCNF f = (deMorgan (nnf (arrowfree f)))
 
 deMorgan :: Form -> Form
-deMorgan (Prop x) = Prop f
-deMorgan (Neg (Prop x)) = Neg (Prop f)
+deMorgan (Prop f) = Prop f
+deMorgan (Neg (Prop f)) = Neg (Prop f)
 deMorgan (Cnj fs) = Cnj (map deMorgan fs)
 deMorgan (Dsj []) = Dsj []
 deMorgan (Dsj [f]) = deMorgan f
