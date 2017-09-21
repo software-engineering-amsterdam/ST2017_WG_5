@@ -4,7 +4,7 @@ import System.Random
 import Test.QuickCheck
 import Lecture3
 
--- Exercise CNF, time 8 hours:
+-- Exercise 3 CNF, time 8 hours:
 -- For this exercise we were struggling at first to cope with the
 -- the syntax and way the logic formulas were represented. After
 -- figuring out how to work with them, we thought applying arrowfree

@@ -56,6 +56,35 @@ tester :: String -> Bool
 tester x = if length(parse x) > 0 then show (head (parse x)) == x
             else False
 
+
+-- Exercise 3 CNF, time 8 hours:
+-- For this exercise we were struggling at first to cope with the
+-- the syntax and way the logic formulas were represented. After
+-- figuring out how to work with them, we thought applying arrowfree
+-- and nnf from the lecture3 code was sufficient to get the cnf. However, we also have to
+-- apply de morgan's law to get the needed conjunction of disjunctions.
+-- To get the good cnf we go through the logic formula and apply the
+-- required action per conjunction or disjunction untill reaching the p,q or r.
+toCNF :: Form -> Form
+toCNF f = (deMorgan (nnf (arrowfree f)))
+
+deMorgan :: Form -> Form
+deMorgan (Prop f) = Prop f
+deMorgan (Neg (Prop f)) = Neg (Prop f)
+deMorgan (Cnj fs) = Cnj (map deMorgan fs)
+deMorgan (Dsj []) = Dsj []
+deMorgan (Dsj [f]) = deMorgan f
+deMorgan (Dsj (f:fs)) = deMorgan2 (deMorgan f) (deMorgan (Dsj fs))
+
+deMorgan2 :: Form -> Form -> Form
+deMorgan2 (Cnj []) _ = Cnj []
+deMorgan2  _ (Cnj []) = Cnj []
+deMorgan2 f (Cnj [g]) = deMorgan2 f g
+deMorgan2 (Cnj [f]) g  = deMorgan2 f g
+deMorgan2 f (Cnj (g:gs)) = Cnj [deMorgan2 f g, deMorgan2 f (Cnj gs)]
+deMorgan2 (Cnj (f:fs)) g = Cnj [deMorgan2 f g, deMorgan2 (Cnj fs) g]
+deMorgan2 f g = Dsj [f, g]
+
 --main = do
 --    print "These tests should return true:"
 --    print(tester (show(Equiv (Impl p q) (Impl (Neg q) (Neg p)))))
@@ -97,27 +126,8 @@ tester x = if length(parse x) > 0 then show (head (parse x)) == x
 --
 -- Results:
 -- Every test case is passed, the test cases that should return true returned true, and the test cases that should return false returned false.
-
-deMorgan :: Form -> Form
-deMorgan f@(Prop x) = f
-deMorgan f@(Neg (Prop x)) = f
-deMorgan (Cnj fs) = Cnj (map deMorgan fs)
-deMorgan (Dsj []) = Dsj []
-deMorgan (Dsj [f]) = deMorgan f
-deMorgan (Dsj (f:fs)) = deMorgan2 (deMorgan f) (deMorgan (Dsj fs))
-
-deMorgan2 :: Form -> Form -> Form
-deMorgan2 (Cnj []) _ = Cnj []
-deMorgan2 (Cnj [f]) g  = deMorgan2 f g
-deMorgan2 (Cnj (f:fs)) g = Cnj [deMorgan2 f g, deMorgan2 (Cnj fs) g]
-deMorgan2  _ (Cnj []) = Cnj []
-deMorgan2 f (Cnj [g]) = deMorgan2 f g
-deMorgan2 f (Cnj (g:gs)) = Cnj [deMorgan2 f g, deMorgan2 f (Cnj gs)]
-deMorgan2 f g = Dsj [f, g]
-
-
-toCNF :: Form -> IO Form
-toCNF f = 
+toCNF4 :: Form -> IO Form
+toCNF4 f = 
     return (deMorgan (nnf (arrowfree f)))
 
 
@@ -188,7 +198,7 @@ cnfTester 0 a b = do
     print (show b)
 cnfTester num_tests counter_good counter_bad = do 
     a <- genProposition
-    b <- toCNF a
+    b <- toCNF4 a
     let result = tautology(Equiv a b)
     print a
     if result then cnfTester (num_tests - 1) (counter_good + 1) (counter_bad)
