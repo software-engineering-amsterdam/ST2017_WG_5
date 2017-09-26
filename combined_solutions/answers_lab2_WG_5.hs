@@ -19,8 +19,12 @@ import Test.QuickCheck
 import System.Random
 import Data.List
 import Test.QuickCheck
+<<<<<<< HEAD
+import Data.Char (ord)
+=======
 import Data.Char
 
+>>>>>>> b1e9f90c0757e0f565b80cdc8c8f0a45db0a8daa
 import Data.Array.ST
 import Control.Monad
 import Control.Monad.ST
@@ -131,6 +135,10 @@ tests = [(3,4,5,Rectangular),(5,12,13, Rectangular),(3,3,3, Equilateral),
 
 ---assignment 3-------------------------------------------- (8 hours, mostly figuring out how to properly sort the properties.)
 -- From the labs
+<<<<<<< HEAD
+infix 1 //> 
+=======
+>>>>>>> b1e9f90c0757e0f565b80cdc8c8f0a45db0a8daa
 
 (//>) :: Bool -> Bool -> Bool
 p //> q = (not p) || q
@@ -281,7 +289,11 @@ prop_trans a = let
 --      List with the same integeres [2,2,2] -> will not succeed because all permutations are still the same lists
 -- List of properties strong -> weak:
 -- commutative, reflexive     
+<<<<<<< HEAD
+
+=======
 infix 1 //> 
+>>>>>>> b1e9f90c0757e0f565b80cdc8c8f0a45db0a8daa
 
 -- The reflexive property, checked with quickCheck
 reflexive_prop :: [Int] -> [Int] -> Bool
