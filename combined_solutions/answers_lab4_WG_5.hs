@@ -73,3 +73,35 @@ symClos :: Ord a => Rel a -> Rel a
 symClos x = sort(nub (turnTuple x))
 
 assignment5 = print (symClos [(1,2),(2,3),(3,4)])
+
+-----------6 2 hours
+
+--fixed point from the lecture code
+fp :: Eq a => (a -> a) -> a -> a 
+fp f = until (\ x -> x == f x) f
+
+
+trClos :: Ord a => Rel a -> Rel a 
+trClos a= sort(fp (\ b -> (nub) ( b ++ (b @@ b))) a)
+
+-----------7 4 hours
+
+testTrClos:: (Eq a) => Ord a => Rel a  -> Bool
+testTrClos a = contains a (trClos a)
+
+testSymClos:: (Eq a) => Ord a => Rel a  -> Bool
+testSymClos a = contains a (symClos a)
+
+contains:: Eq a => [a] -> [a] -> Bool
+contains a b = all (\x -> elem x b) a 
+
+testerTrClos:: Integral a => Rel a -> Bool
+testerTrClos a = testTrClos a
+
+testerSymClos:: Integral a => Rel a -> Bool
+testerSymClos a = testSymClos a
+
+
+
+
+
