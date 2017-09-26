@@ -19,12 +19,37 @@ import Test.QuickCheck
 import System.Random
 import Data.List
 import Test.QuickCheck
-import Data.Char (ord)
+import Data.Char
 
 import Data.Array.ST
 import Control.Monad
 import Control.Monad.ST
 import Data.STRef
+
+
+-- | Randomly shuffle a list without the IO Monad
+--   /O(N)/
+shuffle :: [a] -> StdGen -> ([a],StdGen)
+shuffle xs gen = runST (do
+        g <- newSTRef gen
+        let randomRST lohi = do
+              (a,s') <- liftM (randomR lohi) (readSTRef g)
+              writeSTRef g s'
+              return a
+        ar <- newArray n xs
+        xs' <- forM [1..n] $ \i -> do
+                j <- randomRST (i,n)
+                vi <- readArray ar i
+                vj <- readArray ar j
+                writeArray ar j vi
+                return vj
+        gen' <- readSTRef g
+        return (xs',gen'))
+  where
+    n = length xs
+    newArray :: Int -> [a] -> ST s (STArray s Int a)
+    newArray n xs =  newListArray (1,n) xs
+
 
 -- Random float generator, generates numbers between 1 and 0
 probs :: Int -> IO [Float]
@@ -106,17 +131,16 @@ tests = [(3,4,5,Rectangular),(5,12,13, Rectangular),(3,3,3, Equilateral),
 
 ---assignment 3-------------------------------------------- (8 hours, mostly figuring out how to properly sort the properties.)
 -- From the labs
-infix 1 --> 
 
-(-->) :: Bool -> Bool -> Bool
-p --> q = (not p) || q
+(//>) :: Bool -> Bool -> Bool
+p //> q = (not p) || q
 
 forall :: [a] -> (a -> Bool) -> Bool
 forall = flip all
 
 -- From the labs.
 stronger, weaker :: [a] -> (a -> Bool) -> (a -> Bool) -> Bool
-stronger xs p q = forall xs (\ x -> p x --> q x)
+stronger xs p q = forall xs (\ x -> p x //> q x)
 weaker   xs p q = stronger xs q p 
 
 -- The four properties from the workshop.
@@ -257,18 +281,15 @@ prop_trans a = let
 --      List with the same integeres [2,2,2] -> will not succeed because all permutations are still the same lists
 -- List of properties strong -> weak:
 -- commutative, reflexive     
-infix 1 --> 
-
-(-->) :: Bool -> Bool -> Bool
-p --> q = (not p) || q
+infix 1 //> 
 
 -- The reflexive property, checked with quickCheck
 reflexive_prop :: [Int] -> [Int] -> Bool
-reflexive_prop x y = isDerangement x y --> isDerangement x y
+reflexive_prop x y = isDerangement x y //> isDerangement x y
 
 -- The commutative property, checked with quickCheck
 commutative_prop :: [Int] -> [Int] -> Bool
-commutative_prop x y = isDerangement x y --> isDerangement y x
+commutative_prop x y = isDerangement x y //> isDerangement y x
 
 perms :: [a] ->[[a]]
 perms [] = [[]]
