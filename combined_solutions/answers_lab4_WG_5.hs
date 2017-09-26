@@ -85,7 +85,9 @@ trClos :: Ord a => Rel a -> Rel a
 trClos a= sort(fp (\ b -> (nub) ( b ++ (b @@ b))) a)
 
 -----------7 4 hours
-
+--can be run from ghci via GHCI 
+--quickCheck testerTrClos
+--quickCheck testerSymClos
 testTrClos:: (Eq a) => Ord a => Rel a  -> Bool
 testTrClos a = contains a (trClos a)
 
