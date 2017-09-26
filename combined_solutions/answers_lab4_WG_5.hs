@@ -1,6 +1,6 @@
 -- Jordy Bottelier
 -- Lars Lokhoff
--- Timo Dobber(kroket)
+-- Timo Dobber
 -- Dennis Kruidenberg
 
 
@@ -45,4 +45,10 @@ assignment2 = do
 	a <- arbitrarySingleSet
 	print a
 
+-- Assignment 5 (time: 1 hour)
+turnTuple :: Rel a -> Rel a
+turnTuple [] = []
+turnTuple (x:xs) = x : (snd x, fst x) : (turnTuple xs)
 
+symClos :: Ord a => Rel a -> Rel a
+symClos x = sort(nub (turnTuple x))
