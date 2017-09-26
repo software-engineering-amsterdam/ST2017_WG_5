@@ -192,12 +192,12 @@ prop_trans a = let
 	c = fst ( shuffle a (mkStdGen (head b)))
 	in (((isPermutation a b && isPermutation c a) && isPermutation b c) //> (isPermutation a b))
 
---main = do
---	print ("Symmetry Property:")
---	quickCheck prop_symm
---	print ("Commutativity Property:")
---	quickCheck prop_comm
---	print ("Reflexivity Property:")
---	quickCheck prop_ref
---	print ("Transetivity Property:")
---	quickCheck prop_trans
+main = do
+	print ("Symmetry Property:")
+	quickCheck prop_symm
+	print ("Commutativity Property:")
+	quickCheck prop_comm
+	print ("Reflexivity Property:")
+	quickCheck prop_ref
+	print ("Transetivity Property:")
+	quickCheck prop_trans

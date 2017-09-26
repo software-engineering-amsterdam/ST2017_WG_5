@@ -181,9 +181,5 @@ cnfTester num_tests counter_good counter_bad = do
         else cnfTester (num_tests - 1) (counter_good) (counter_bad + 1)
     
 
---randomProp :: [Char]
---randomProp = "(" ++ (show 1) ++ getOp ++ (show 3) ++ ")"
---randomProp = getOp ++ "(" ++ (show 1) ++ (show 3) ++ ")"
-
 main = cnfTester 100 0 0
 

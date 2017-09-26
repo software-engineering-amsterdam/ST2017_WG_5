@@ -68,6 +68,7 @@ tester x = if length(parse x) > 0 then show (head (parse x)) == x
 toCNF :: Form -> Form
 toCNF f = (deMorgan (nnf (arrowfree f)))
 
+-- Apply de Morgan's distributive laws by using pattern matching. 
 deMorgan :: Form -> Form
 deMorgan (Prop f) = Prop f
 deMorgan (Neg (Prop f)) = Neg (Prop f)
@@ -76,6 +77,9 @@ deMorgan (Dsj []) = Dsj []
 deMorgan (Dsj [f]) = deMorgan f
 deMorgan (Dsj (f:fs)) = deMorgan2 (deMorgan f) (deMorgan (Dsj fs))
 
+-- Apply de Morgan's distributive laws by using pattern matching.
+-- These are for repositioning a disjunction with a conjunction:
+-- (A ^ B) v C --> (A v C) ^ (B v C)
 deMorgan2 :: Form -> Form -> Form
 deMorgan2 (Cnj []) _ = Cnj []
 deMorgan2  _ (Cnj []) = Cnj []
