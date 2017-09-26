@@ -11,7 +11,7 @@ import SetOrd
 import Test.QuickCheck.Gen
 
 
--- Assignment 2 --------------------------------------------------------------------------------------
+-- Assignment 2 (3 hours) --------------------------------------------------------------------------------------
 -- create random integer in interval
 genInt :: Int -> Int -> IO Int
 genInt a b = getStdRandom (randomR (a,b))
@@ -44,3 +44,5 @@ assignment2 = do
 	print "QuickCheck generated set: "
 	a <- arbitrarySingleSet
 	print a
+
+
