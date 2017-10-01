@@ -84,3 +84,8 @@ generateAnySetPair generater = do
 -- This generates an pair of 2 integer sets using the functions above
 generateIntegerSet :: IO (Set Int, Set Int)
 generateIntegerSet = generateAnySetPair arbitraryIntSets
+
+-- Exercise 4, time: 2 hours
+-- Why is an asymmetric relation always anitsymmetric?
+-- What is the reflexive transitive closure of R = {(n, n + 1) | n ∈ N} ?
+
