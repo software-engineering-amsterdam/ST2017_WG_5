@@ -34,6 +34,12 @@ import Test.QuickCheck.Gen
 
 type Rel a = [(a,a)]
 
+infixr 5 @@
+
+(@@) :: Eq a => Rel a -> Rel a -> Rel a
+r @@ s = 
+  nub [ (x,z) | (x,y) <- r, (w,z) <- s, y == w ]
+
 -- Assignment 2 (3 hours) --------------------------------------------------------------------------------------
 -- create random integer in interval
 genInt :: Int -> Int -> IO Int
@@ -43,16 +49,16 @@ genInt a b = getStdRandom (randomR (a,b))
 fillList :: Int -> IO [Int]
 fillList 0 = return []
 fillList n = do
-	newInt  <- genInt (-200) 200
-	myList <- fillList (n-1)
-	return (newInt:myList)
+    newInt  <- genInt (-200) 200
+    myList <- fillList (n-1)
+    return (newInt:myList)
 
 -- First create a list of random length, then turn this into a set
 genSetInt :: IO (Set Int)
 genSetInt = do
-	len <- genInt 1 50
-	generated_list <- (fillList len)
-	return (list2set generated_list)
+    len <- genInt 1 50
+    generated_list <- (fillList len)
+    return (list2set generated_list)
 
 -- Use quickcheck to create a set
 arbitrarySingleSet :: IO (Set Int)
@@ -61,12 +67,12 @@ arbitrarySingleSet = do
     return (list2set k)
 
 assignment2 = do
-	print "Manually generated set: "
-	a <- genSetInt
-	print a
-	print "QuickCheck generated set: "
-	a <- arbitrarySingleSet
-	print a
+    print "Manually generated set: "
+    a <- genSetInt
+    print a
+    print "QuickCheck generated set: "
+    a <- arbitrarySingleSet
+    print a
 
 -- Assignment 3, Time: 7 hours
 
