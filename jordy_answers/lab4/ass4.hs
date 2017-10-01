@@ -3,6 +3,23 @@
 -- Timo Dobber(kroket)
 -- Dennis Kruidenberg
 
+--Questions assignment 1 (time spent 2 hours)
+-- 1. Why can't a set be legitimate and extraordinary at the same time?
+-- 2. Why can a pair be defined by (a, b) = {{a}, {a, b}}
+-- 3. If (a, b) = {{a}, {a, b}}, is (a, b, c) = {{a}, {a, b}, {a, b, c}}?
+
+-- Assignment 8 time spent(45 minutes): 
+-- Consider our domain R = (x, y)
+-- Then the transative closure of R = {(x, y)}
+-- Symmetric closure is defined as : S = R U {(x, y) : (y, x) -> R}
+-- Therefore the symmetric closure of the transative closure of R is {(x, y), (y, x)}
+--
+-- The symmetric closure of (x, y) is (following our definition) {(x, y), (y, x)}
+-- The transative closure of this is: {(x, x), (y, y), (x, y), (y, x)}
+
+-- So to the question:
+-- Is there a difference between the symmetric closure of the transitive closure of a relation RR and the transitive closure of the symmetric closure of RR?
+-- Yes there is, its the difference between  {(x, y), (y, x)} and {(x, x), (y, y), (x, y), (y, x)}
 
 import Data.List
 import Test.QuickCheck
@@ -11,7 +28,7 @@ import SetOrd
 import Test.QuickCheck.Gen
 
 
--- Assignment 2 --------------------------------------------------------------------------------------
+-- Assignment 2 (3 hours) --------------------------------------------------------------------------------------
 -- create random integer in interval
 genInt :: Int -> Int -> IO Int
 genInt a b = getStdRandom (randomR (a,b))

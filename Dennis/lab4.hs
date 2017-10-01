@@ -31,18 +31,24 @@ symClos x = sort(nub (turnTuple x))
 testTrClos:: (Eq a) => Ord a => Rel a  -> Bool
 testTrClos a = contains a (trClos a)
 
+
 testSymClos:: (Eq a) => Ord a => Rel a  -> Bool
 testSymClos a = contains a (symClos a)
+
 
 contains:: Eq a => [a] -> [a] -> Bool
 contains a b = all (\x -> elem x b) a 
 
+--https://www.stackbuilders.com/news/a-quickcheck-tutorial-generators
+newtype Tester = Tester Int deriving (Eq,Show,Ord)
+instance Arbitrary Tester  where 
+    arbitrary = oneof $ map (return.Tester) [-10..10]
 
 
-arbitraryRels :: IO [(Int, Int)]
-arbitraryRels = do
-    k <- generate arbitrary :: IO [(Int, Int)]
-    return (k)
+--arbitraryRels :: IO [(Int, Int)]
+--arbitraryRels = do
+--    k <- generate arbitrary :: IO [(Int, Int)]
+--    return (k)
 
 --checkTrClos::IO Bool
 --checkTrClos = do
@@ -51,6 +57,12 @@ arbitraryRels = do
 --    result <- testTrClos a
 --    return result
 
+checkSymClos a = testSymClos a
+    where types= a::Rel Tester
+
+checkTrClos a = testTrClos a
+    where types= a::Rel Tester
+
 
 
 
@@ -58,7 +70,7 @@ arbitraryRels = do
 
 main = do
     quickCheck checkSymClos
-    quickCheck checkTrclos
+    quickCheck checkTrClos
 
     --print(trClos [(1,2),(2,3),(3,4)])
     --print(testTrClos [(1,2),(2,3),(3,4)])
