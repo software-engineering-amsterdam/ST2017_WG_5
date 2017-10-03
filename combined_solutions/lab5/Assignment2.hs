@@ -1,5 +1,4 @@
 --time: 2 hours
-
 module Assignment2
 
 where 
@@ -21,20 +20,13 @@ values    = [1..9]
 rowConstrnt = [[(r,c)| c <- values ] | r <- values ]
 columnConstrnt = [[(r,c)| r <- values ] | c <- values ]
 blockConstrnt = [[(r,c)| r <- b1, c <- b2 ] | b1 <- blocks, b2 <- blocks ]
-blockNrcConstrnt = [[(r,c)| r <- b1, c <- b2 ] | b1 <- blocksnrc, b2 <- blocksnrc ]
-
-
-freeAtPos' :: Sudoku -> Position -> Constrnt -> [Value]
-freeAtPos' s (r,c) xs = let 
-  ys = filter (elem (r,c)) xs 
-  in 
-  foldl1 intersect (map ((values \\) . map s) ys)
+blockNrcConstrnt = [[(r,c)| r <- b1, c <- b2 ] | b1 <- blocksNrc, b2 <- blocksNrc ]
 
 blocks :: [[Int]]
 blocks = [[1..3],[4..6],[7..9]]
---ADD
-blocksnrc :: [[Int]]
-blocksnrc = [[2..4],[6..8]]
+
+blocksNrc :: [[Int]]
+blocksNrc = [[2..4],[6..8]]
 
 showVal :: Value -> String
 showVal 0 = " "
@@ -84,44 +76,15 @@ showSudoku = showGrid . sud2grid
 bl :: Int -> [Int]
 bl x = concat $ filter (elem x) blocks
 
---ADDED
-bln :: Int -> [Int]
-bln x = concat $ filter (elem x) blocksnrc
-
 subGrid :: Sudoku -> (Row,Column) -> [Value]
 subGrid s (r,c) = 
   [ s (r',c') | r' <- bl r, c' <- bl c ]
 
---ADDED
---subGridNrc :: Sudoku -> (Row,Column) -> [Value]
---subGridNrc s (r,c) = 
---  [ s (r',c') | r' <- bln r, c' <- bln c ]
-
-freeInSeq :: [Value] -> [Value]
-freeInSeq seq = values \\ seq 
-
-freeInRow :: Sudoku -> Row -> [Value]
-freeInRow s r = 
-  freeInSeq [ s (r,i) | i <- positions  ]
-
-freeInColumn :: Sudoku -> Column -> [Value]
-freeInColumn s c = 
-  freeInSeq [ s (i,c) | i <- positions ]
-
-freeInSubgrid :: Sudoku -> (Row,Column) -> [Value]
-freeInSubgrid s (r,c) = freeInSeq (subGrid s (r,c))
-
---ADDED
---freeInNrcgrid :: Sudoku -> (Row,Column) -> [Value]
---freeInNrcgrid s (r,c) = freeInSeq (subGridNrc s (r,c))
-
-freeAtPos :: Sudoku -> (Row,Column) -> [Value]
-freeAtPos s (r,c) = 
-  (freeInRow s r) 
-   `intersect` (freeInColumn s c) 
-   `intersect` (freeInSubgrid s (r,c))
-   --ADDED
-   --`intersect` (freeInNrcgrid s (r,c))
+freeAtPos' :: Sudoku -> Position -> Constrnt -> [Value]
+freeAtPos' s (r,c) xs = let 
+  ys = filter (elem (r,c)) xs 
+  in 
+  foldl1 intersect (map ((values \\) . map s) ys)
 
 injective :: Eq a => [a] -> Bool
 injective xs = nub xs == xs
@@ -138,11 +101,6 @@ subgridInjective :: Sudoku -> (Row,Column) -> Bool
 subgridInjective s (r,c) = injective vs where 
    vs = filter (/= 0) (subGrid s (r,c))
 
--- ADDED
---subgridInjectivenrc :: Sudoku -> (Row,Column) -> Bool
---subgridInjectivenrc s (r,c) = injective vs where 
---   vs = filter (/= 0) (subGridNrc s (r,c))
-
 consistent :: Sudoku -> Bool
 consistent s = and $
                [ rowInjective s r |  r <- positions ]
@@ -151,10 +109,9 @@ consistent s = and $
                 ++
                [ subgridInjective s (r,c) | 
                     r <- [1,4,7], c <- [1,4,7]]
-               -- ++
-               -- -- ADDED:
-               --[ subgridInjectivenrc s (r,c) | 
-               --     r <- [2,6], c <- [2,6]]
+                ++
+               [ subgridInjective s (r,c) | 
+                    r <- [2,6], c <- [2,6]]
 
 extend :: Sudoku -> ((Row,Column),Value) -> Sudoku
 extend = update
@@ -178,8 +135,6 @@ extendNode (s,constraints) (r,c,vs) =
      sortBy length3rd $ 
          prune (r,c,v) constraints) | v <- vs ]
 
-
-
 prune :: (Row,Column,Value) 
       -> [Constraint] -> [Constraint]
 prune _ [] = []
@@ -188,17 +143,11 @@ prune (r,c,v) ((x,y,zs):rest)
   | c == y = (x,y,zs\\[v]) : prune (r,c,v) rest
   | sameblock (r,c) (x,y) = 
         (x,y,zs\\[v]) : prune (r,c,v) rest
-  --ADDED
-  | sameblocknrc (r,c) (x,y) = 
-        (x,y,zs\\[v]) : prune (r,c,v) rest
   | otherwise = (x,y,zs) : prune (r,c,v) rest
 
 sameblock :: Position -> Position -> Bool
 sameblock pos1 pos2 = any (\x -> elem pos1 x && elem pos2 x) (rowConstrnt ++ columnConstrnt ++ blockConstrnt ++ blockNrcConstrnt)
 
---ADDED
-sameblocknrc :: (Row,Column) -> (Row,Column) -> Bool
-sameblocknrc (r,c) (x,y) = bln r == bln x && bln c == bln y
 initNode :: Grid -> [Node]
 initNode gr = let s = grid2sud gr in 
               if (not . consistent) s then [] 
@@ -217,14 +166,12 @@ constraints s = sortBy length3rd
     [(r,c, freeAtPos' s (r,c) (rowConstrnt ++ columnConstrnt ++ blockConstrnt ++ blockNrcConstrnt)) | 
                        (r,c) <- openPositions s ]
 
-
 data Tree a = T a [Tree a] deriving (Eq,Ord,Show)
 
 exmple1 = T 1 [T 2 [], T 3 []]
 exmple2 = T 0 [exmple1,exmple1,exmple1]
 
 grow :: (node -> [node]) -> node -> Tree node 
-
 grow step seed = T seed (map (grow step) (step seed))
 
 count :: Tree a -> Int 
