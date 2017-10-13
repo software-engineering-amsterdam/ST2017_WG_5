@@ -1,6 +1,6 @@
 
 import Lecture6
--- assignment 2 test report:
+-- assignment 2 (2 hours) test report, code for assignment 1 can be found in the lecture code:
 -- We execute the same tests using both implementations 100.000 times with the arguments:
 -- x = 20000
 -- y = 43000000

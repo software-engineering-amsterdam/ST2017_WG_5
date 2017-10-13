@@ -213,7 +213,7 @@ secret, bound :: Integer
 secret = mers 18
 bound  = 131
 
--- code for assignment 1
+-- code for assignment 1 (time spent: 3 hours)
 exM :: Integer -> Integer -> Integer -> Integer
 exM x y n = (exMHelper x y n 1)
 
