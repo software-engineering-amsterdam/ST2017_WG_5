@@ -22,23 +22,49 @@ import Lecture6
 testExM :: Integer -> Integer -> Integer -> Integer -> Integer
 testExM x y n 0 = exM x y n
 testExM x y n num_tests = do
-	let f = exM x y n
-	if num_tests /= 0 
-		then (testExM x (y+1) n (num_tests-1))
-		else (testExM x (y+1) n (num_tests-1))
+    let f = exM x y n
+    if num_tests /= 0 
+        then (testExM x (y+1) n (num_tests-1))
+        else (testExM x (y+1) n (num_tests-1))
 
 testExpM :: Integer -> Integer -> Integer -> Integer -> Integer
 testExpM x y n 0 = expM x y n
 testExpM x y n num_tests = do
-	let f = expM x y n
-	if num_tests /= 0 
-		then (testExpM x (y+1) n (num_tests-1))
-		else (testExpM x (y+1) n (num_tests-1))
+    let f = expM x y n
+    if num_tests /= 0 
+        then (testExpM x (y+1) n (num_tests-1))
+        else (testExpM x (y+1) n (num_tests-1))
 
 
 main1= print "haskell"
 main2 = print (testExpM 20000 43000000 301 100000)
 main3 = print (testExM 20000 43000000 301 100000)
+----------------------------------------------------------------------------------
+-- Exercise 3, time: 15 minutes
+composites :: [Integer]
+composites = [k | 
+            k <- [2..],
+            not (prime k)]
+
+----------------------------------------------------------------------------------
+-- Exercise 4, time: 30 minutes
+-- k=1 : Lowest I can find is 9
+-- k=2 : Also 9
+-- k=3 : 65
+-- By increasing k we can increase the 'correctness' of the check
+composites2 :: Integer -> [Integer]
+composites2 n = [k | 
+            k <- [2..n],
+            not (prime k)]
+
+checkComposites :: Int -> [Integer] -> IO ()
+checkComposites k (x:xs) = do
+                        t <- primeTestsF k x 
+                        if t
+                            then if not (prime x)
+                                then print ("Laagste " ++ show x ++ ".")
+                                else checkComposites k xs
+                        else checkComposites k xs   
 
 ----------------------------------------------------------------------------------
 -- Assignment 5 (Time spent: 2 hours)
